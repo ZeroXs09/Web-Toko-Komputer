@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations */
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+    display: flex;
+    width: max-content;
+    animation: scroll 25s linear infinite;
+}
+
+/* Styling Logo ala Fnatic */
+.brand-logo {
+    height: 60px; /* Fnatic cenderung pakai logo kecil dan elegan */
+    width: auto;
+    object-contain: contain;
+    opacity: 1; /* Redup secara default */
+    transition: all 0.4s ease;
+}
+
+.brand-logo:hover {
+    opacity: 1;
+    filter: brightness(1) invert(0); /* Kembali ke warna asli saat hover */
+    transform: scale(1.1);
+}
+
+/* Masking agar hilang halus di kiri & kanan */
+.fnatic-mask {
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+}
+
+/* Animasi tetap lancar */
+.animate-scroll {
+    display: flex;
+    width: max-content;
+    animation: scroll 35s linear infinite; /* Kecepatan lambat lebih terlihat mewah */
+}
+
+/* Pause saat kursor di atas slider */
+.fnatic-mask:hover .animate-scroll {
+    animation-play-state: paused;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
