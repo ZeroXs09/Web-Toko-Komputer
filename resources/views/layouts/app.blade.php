@@ -7,14 +7,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-[#2a2a2a] text-white">
-
     @include('partials.header')
 
     <main>
         @yield('content')
     </main>
 
-    @include('partials.footer')
+    
 
+    @include('partials.footer')
 </body>
 </html>

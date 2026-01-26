@@ -7,12 +7,10 @@
     <div class="max-w-5xl mx-auto">
         <h1 class="text-4xl font-bold text-white mb-8">Checkout</h1>
 
-        <form action="{{ route('checkout.process') }}" method="POST" id="checkoutForm">
+        <form action="{{ route('checkout.process') }}" method="POST" id="checkoutForm" onsubmit="this.querySelector('button[type=submit]').disabled=true;">
             @csrf
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Checkout Form -->
                 <div class="md:col-span-2 space-y-6">
-                    <!-- Customer Information -->
                     <div class="bg-[#1a1a1a] border border-gray-700 rounded-lg p-6">
                         <h2 class="text-xl font-bold text-white mb-6">Customer Information</h2>
 
@@ -45,9 +43,22 @@
                                 @enderror
                             </div>
                         </div>
+
+                        <div class="mt-6">
+                            <h3 class="text-white font-bold text-lg mb-4">Shipping Address</h3>
+                            <textarea
+                                name="customer_address"
+                                rows="4"
+                                class="w-full px-4 py-3 bg-[#2a2a2a] border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-white @error('customer_address') border-red-500 @enderror"
+                                placeholder="Contoh: Jl. Veteran No.1A, Babakan, Tangerang. Kode Pos: 15118"
+                                required
+                            >{{ old('customer_address') }}</textarea>
+                            @error('customer_address')
+                                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
-                    <!-- Payment Method -->
                     <div class="bg-[#1a1a1a] border border-gray-700 rounded-lg p-6">
                         <h2 class="text-xl font-bold text-white mb-6">Payment Method</h2>
 
@@ -72,21 +83,6 @@
                                 <input
                                     type="radio"
                                     name="payment_method"
-                                    value="card"
-                                    class="w-5 h-5"
-                                    onchange="toggleCashInput(false)"
-                                    {{ old('payment_method') == 'card' ? 'checked' : '' }}
-                                >
-                                <div class="flex-1">
-                                    <div class="text-white font-medium">Credit/Debit Card</div>
-                                    <div class="text-gray-400 text-sm">Visa, Mastercard, etc.</div>
-                                </div>
-                            </label>
-
-                            <label class="flex items-center gap-4 p-4 border border-gray-600 rounded-lg cursor-pointer hover:border-white transition">
-                                <input
-                                    type="radio"
-                                    name="payment_method"
                                     value="e-wallet"
                                     class="w-5 h-5"
                                     onchange="toggleCashInput(false)"
@@ -99,16 +95,15 @@
                             </label>
                         </div>
 
-                        <!-- Cash Amount Input (shown only for cash payment) -->
                         <div id="cashAmountSection" class="mt-4 hidden">
-                            <label class="block text-gray-400 mb-2">Cash Amount (Rp)</label>
+                            <label class="block text-gray-400 mb-2">Cash Amount (Nominal Lengkap)</label>
                             <input
                                 type="number"
                                 name="cash_amount"
                                 id="cashAmountInput"
                                 value="{{ old('cash_amount') }}"
                                 min="0"
-                                step="1000"
+                                placeholder="Contoh: 10000000"
                                 class="w-full px-4 py-3 bg-[#2a2a2a] border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-white @error('cash_amount') border-red-500 @enderror"
                             >
                             @error('cash_amount')
@@ -116,35 +111,12 @@
                             @enderror
 
                             <div id="changeDisplay" class="mt-3 text-green-400 font-medium hidden">
-                                Change: Rp <span id="changeAmount">0</span>K
+                                Change: IDR <span id="changeAmount">0</span>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Order Items -->
-                    <div class="bg-[#1a1a1a] border border-gray-700 rounded-lg p-6">
-                        <h2 class="text-xl font-bold text-white mb-6">Order Items</h2>
-
-                        <div class="space-y-4">
-                            @foreach($cart as $item)
-                                <div class="flex justify-between items-start pb-4 border-b border-gray-700 last:border-0">
-                                    <div class="flex-1">
-                                        <p class="text-white font-medium">{{ $item['name'] }}</p>
-                                        <p class="text-gray-400 text-sm">{{ $item['category'] }}</p>
-                                        <p class="text-gray-400 text-sm mt-1">
-                                            {{ $item['quantity'] }} × Rp {{ number_format($item['price'] / 1000, 0) }}K
-                                        </p>
-                                    </div>
-                                    <div class="text-white font-bold">
-                                        Rp {{ number_format(($item['price'] * $item['quantity']) / 1000, 0) }}K
-                                    </div>
-                                </div>
-                            @endforeach
                         </div>
                     </div>
                 </div>
 
-                <!-- Order Summary -->
                 <div class="md:col-span-1">
                     <div class="bg-[#1a1a1a] border border-gray-700 rounded-lg p-6 sticky top-32">
                         <h2 class="text-xl font-bold text-white mb-6">Order Summary</h2>
@@ -152,21 +124,21 @@
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-gray-400">
                                 <span>Subtotal</span>
-                                <span>Rp {{ number_format($subtotal / 1000, 0) }}K</span>
+                                <span>IDR {{ number_format($subtotal, 0, ',', '.') }}</span>
                             </div>
                             <div class="flex justify-between text-gray-400">
                                 <span>Tax (11%)</span>
-                                <span>Rp {{ number_format($tax / 1000, 0) }}K</span>
+                                <span>IDR {{ number_format($tax, 0, ',', '.') }}</span>
                             </div>
                             <div class="border-t border-gray-700 pt-3">
                                 <div class="flex justify-between text-white font-bold text-2xl">
                                     <span>Total</span>
-                                    <span id="totalAmount">Rp {{ number_format($total / 1000, 0) }}K</span>
+                                    <span id="totalAmount">IDR {{ number_format($total, 0, ',', '.') }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-white text-black py-3 rounded-lg hover:bg-gray-200 transition font-medium mb-3">
+                        <button type="submit" class="w-full bg-white text-black py-3 rounded-lg hover:bg-gray-200 transition font-bold mb-3">
                             Complete Payment
                         </button>
 
@@ -198,22 +170,20 @@
         }
     }
 
-    // Calculate change
     document.getElementById('cashAmountInput')?.addEventListener('input', function() {
         const cashAmount = parseFloat(this.value) || 0;
         const change = cashAmount - totalInRupiah;
         const changeDisplay = document.getElementById('changeDisplay');
-        const changeAmount = document.getElementById('changeAmount');
+        const changeAmountSpan = document.getElementById('changeAmount');
 
         if (change >= 0) {
-            changeAmount.textContent = (change / 1000).toFixed(0);
+            changeAmountSpan.textContent = new Intl.NumberFormat('id-ID').format(change);
             changeDisplay.classList.remove('hidden');
         } else {
             changeDisplay.classList.add('hidden');
         }
     });
 
-    // Show cash input if cash was previously selected
     @if(old('payment_method') == 'cash')
         toggleCashInput(true);
     @endif

@@ -9,19 +9,17 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'transaction_id',
-        'customer_name',
-        'customer_phone',
-        'subtotal',
-        'tax',
-        'total',
-        'payment_method',
-        'cash_amount',
-        'change',
-        'transaction_date',
-    ];
-
+   protected $fillable = [
+    'customer_name',
+    'customer_phone',
+    'customer_address',
+    'tax',
+    'total',
+    'payment_method',
+    'subtotal',
+    'cash_amount',
+    'change'
+];
     protected $casts = [
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
@@ -43,7 +41,7 @@ class Transaction extends Model
         return 'TRX-' . strtoupper(substr(uniqid(), -8));
     }
 
- 
+
     protected static function boot()
     {
         parent::boot();

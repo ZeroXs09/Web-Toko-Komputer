@@ -1,59 +1,78 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\AboutUs;
+
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+use App\Http\Controllers\ProductController;
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+use App\Http\Controllers\CartController;
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-        ->name('login');
+use App\Http\Controllers\CheckoutController;
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+use App\Http\Controllers\TransactionController;
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
+use App\Http\Controllers\BuildController;
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
+use App\Http\Controllers\AdminController;
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+
+// Halaman utama (Public)
+
+Route::get('/', [ProductController::class, 'index'])->name('build');
+
+Route::get('/aboutus', [AboutUs::class, 'TampilanHome'])->name('aboutus');
+
+
+
+// Cart Routes (Bisa diakses tanpa login, tapi checkout nanti butuh login)
+
+Route::prefix('cart')->group(function () {
+
+    Route::get('/', [CartController::class, 'view'])->name('cart');
+
+    Route::post('/add/{product}', [CartController::class, 'add'])->name('cart.add');
+
+    Route::patch('/update/{product}', [CartController::class, 'update'])->name('cart.update');
+
+    Route::delete('/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
+
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
 
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
 
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
+// Fitur yang WAJIB LOGIN (Buyer)
 
-    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
-        ->name('password.confirm');
+Route::middleware(['auth'])->group(function () {
 
-    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
+    Route::get('/history', [TransactionController::class, 'index'])->name('receipts');
 
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+    Route::get('/receipt/{transaction}', [TransactionController::class, 'show'])->name('receipt.show');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+
+
+    Route::prefix('checkout')->group(function () {
+
+        Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
+
+        Route::post('/process', [CheckoutController::class, 'process'])->name('checkout.process');
+
+    });
+
 });
+
+
+
+// Fitur KHUSUS ADMIN (Role 1)
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    Route::resource('products', ProductController::class);
+
+});
+

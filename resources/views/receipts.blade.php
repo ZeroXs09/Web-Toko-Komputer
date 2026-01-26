@@ -7,7 +7,6 @@
     <div class="max-w-7xl mx-auto">
         <h1 class="text-4xl font-bold text-white mb-8">Receipt History</h1>
 
-        <!-- Statistics -->
         <div class="grid md:grid-cols-3 gap-6 mb-8">
             <div class="bg-[#1a1a1a] border border-gray-700 rounded-lg p-6">
                 <div class="flex items-center gap-4">
@@ -19,7 +18,7 @@
                     <div>
                         <p class="text-gray-400 text-sm">Total Revenue</p>
                         <p class="text-2xl font-bold text-white">
-                            Rp {{ number_format($totalRevenue / 1000, 0) }}K
+                            IDR {{ number_format($totalRevenue, 0, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -54,7 +53,6 @@
             </div>
         </div>
 
-        <!-- Search and Filters -->
         <div class="mb-6">
             <form action="{{ route('receipts') }}" method="GET">
                 <div class="relative max-w-xl">
@@ -72,7 +70,6 @@
             </form>
         </div>
 
-        <!-- Receipts Table -->
         <div class="bg-[#1a1a1a] border border-gray-700 rounded-lg overflow-hidden">
             @if($transactions->isEmpty())
                 <div class="text-center py-12">
@@ -112,22 +109,22 @@
                                         {{ $transaction->items->sum('quantity') }} items
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-3 py-1 bg-[#2a2a2a] text-white rounded-full text-sm uppercase">
+                                        <span class="px-3 py-1 bg-[#2a2a2a] text-white rounded-full text-xs font-bold uppercase">
                                             {{ $transaction->payment_method }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-white font-bold">
-                                        Rp {{ number_format($transaction->total / 1000, 0) }}K
+                                        IDR {{ number_format($transaction->total, 0, ',', '.') }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
-                                            <a href="{{ route('receipt.show', $transaction->id) }}" class="text-blue-400 hover:text-blue-300 transition">
+                                            <a href="{{ route('receipt.show', $transaction->id) }}" title="View Detail" class="text-blue-400 hover:text-blue-300 transition">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                 </svg>
                                             </a>
-                                            <a href="{{ route('receipt.print', $transaction->id) }}" class="text-gray-400 hover:text-white transition">
+                                            <a href="{{ route('receipt.print', $transaction->id) }}" title="Print Receipt" class="text-gray-400 hover:text-white transition">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                                                 </svg>

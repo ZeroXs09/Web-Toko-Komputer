@@ -14,7 +14,7 @@
                 <img src="{{ asset('images/logos/gigabyte.png') }}" alt="GIGABYTE" class="brand-logo">
                 <img src="{{ asset('images/logos/adata.png') }}" alt="ADATA" class="brand-logo">
                 <img src="{{ asset('images/logos/nzxt.png') }}" alt="NZXT" class="brand-logo">
-                <img src="{{ asset('images/logos/lianli.png') }}" alt="Lian Li" class="brand-logo">
+                <img src="{{ asset('images/logos/lianli.png') }}" alt="Lian Li" class="brand-logo ">
                 <img src="{{ asset('images/logos/gskill.png') }}" alt="G.Skill" class="brand-logo">
 
                 <img src="{{ asset('images/logos/corsair.png') }}" alt="Corsair" class="brand-logo">
@@ -23,7 +23,7 @@
                 <img src="{{ asset('images/logos/gigabyte.png') }}" alt="GIGABYTE" class="brand-logo">
                 <img src="{{ asset('images/logos/adata.png') }}" alt="ADATA" class="brand-logo">
                 <img src="{{ asset('images/logos/nzxt.png') }}" alt="NZXT" class="brand-logo">
-                <img src="{{ asset('images/logos/lianli.png') }}" alt="Lian Li" class="brand-logo">
+                <img src="{{ asset('images/logos/lianli.png') }}" alt="Lian Li" class="brand-logo ">
                 <img src="{{ asset('images/logos/gskill.png') }}" alt="G.Skill" class="brand-logo">
             </div>
         </div>

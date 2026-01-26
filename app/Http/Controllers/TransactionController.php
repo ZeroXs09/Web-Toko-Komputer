@@ -55,6 +55,6 @@ class TransactionController extends Controller
         $transaction = Transaction::with('items')->findOrFail($id);
 
         $pdf = Pdf::loadView('pdf.receipt', compact('transaction'));
-        return $pdf->download('receipt-' . $transaction->transaction_id . '.pdf');
+        return $pdf->stream('receipt-' . $transaction->transaction_id . '.pdf');
     }
 }
