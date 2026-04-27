@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Receipt - {{ $transaction->transaction_id }}</title>
@@ -9,86 +10,103 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Courier New', monospace;
             padding: 20px;
             max-width: 400px;
             margin: 0 auto;
-            background-color: #f4f4f4;
+            background-color: #2b2b2b;
         }
+
         .receipt-container {
             background-color: white;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             text-align: center;
             border-bottom: 2px dashed #000;
             padding-bottom: 10px;
             margin-bottom: 10px;
         }
+
         .logo {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
         }
+
         .subtitle {
             font-size: 12px;
             color: #666;
         }
+
         .info {
             margin: 10px 0;
             font-size: 12px;
         }
+
         .info-row {
             display: flex;
             justify-content: space-between;
             margin: 5px 0;
         }
+
         .address-section {
             margin-top: 10px;
             padding-top: 5px;
             border-top: 1px dotted #666;
             font-size: 11px;
         }
+
         .address-label {
             font-weight: bold;
             color: #444;
             margin-bottom: 2px;
         }
+
         .address-content {
             line-height: 1.4;
             color: #333;
         }
+
         .items {
             margin: 15px 0;
             border-top: 1px dashed #000;
             border-bottom: 1px dashed #000;
             padding: 10px 0;
         }
+
         .item {
             margin-bottom: 10px;
             font-size: 12px;
         }
+
         .item-header {
             font-weight: bold;
             display: block;
             margin-bottom: 2px;
         }
+
         .item-detail {
             display: flex;
             justify-content: space-between;
             color: #444;
         }
+
         .totals {
             margin: 10px 0;
             font-size: 12px;
         }
+
         .total-row {
             display: flex;
             justify-content: space-between;
             margin: 5px 0;
         }
+
         .grand-total {
             font-size: 15px;
             font-weight: bold;
@@ -96,12 +114,14 @@
             padding-top: 10px;
             margin-top: 10px;
         }
+
         .payment {
             margin: 15px 0;
             font-size: 12px;
             border-top: 1px dashed #000;
             padding-top: 10px;
         }
+
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -110,10 +130,12 @@
             border-top: 1px dashed #000;
             padding-top: 10px;
         }
+
         .no-print {
             margin-bottom: 20px;
             text-align: center;
         }
+
         .btn-print {
             background: #000;
             color: #fff;
@@ -125,18 +147,31 @@
             cursor: pointer;
             border: none;
         }
+
         @media print {
-            .no-print { display: none; }
-            body { background: white; padding: 0; }
-            .receipt-container { box-shadow: none; max-width: 100%; }
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .receipt-container {
+                box-shadow: none;
+                max-width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="no-print">
-        <button onclick="window.print()" class="btn-print">Cetak Struk</button>
-        <a href="{{ route('build') }}" style="display:inline-block; margin-left:10px; color:#666; text-decoration:none; font-family:sans-serif; font-size:14px;">Kembali ke Rakit PC</a>
+        <a href="{{ route('build') }}"
+            style="display:inline-block; margin-left:10px; color:#fffafa; text-decoration:none; font-family:sans-serif; font-size:14px;">Kembali
+            ke Rakit PC</a>
     </div>
 
     <div class="receipt-container">
@@ -168,14 +203,14 @@
         </div>
 
         <div class="items">
-            @foreach($transaction->items as $item)
-            <div class="item">
-                <span class="item-header">{{ $item->product_name }}</span>
-                <div class="item-detail">
-                    <span>{{ $item->quantity }} x IDR {{ number_format($item->price, 0, ',', '.') }}</span>
-                    <span>IDR {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+            @foreach ($transaction->items as $item)
+                <div class="item">
+                    <span class="item-header">{{ $item->product_name }}</span>
+                    <div class="item-detail">
+                        <span>{{ $item->quantity }} x IDR {{ number_format($item->price, 0, ',', '.') }}</span>
+                        <span>IDR {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                    </div>
                 </div>
-            </div>
             @endforeach
         </div>
 
@@ -197,9 +232,11 @@
         <div class="payment">
             <div class="total-row">
                 <span>Payment Method:</span>
-                <strong>{{ strtoupper($transaction->payment_method) }}</strong>
+
+                <strong>{{ strtoupper(str_replace('_', ' ', $transaction->payment_method)) }}</strong>
             </div>
-            @if($transaction->payment_method === 'cash')
+
+            @if ($transaction->payment_method === 'cash')
                 <div class="total-row">
                     <span>Cash Paid:</span>
                     <span>IDR {{ number_format($transaction->cash_amount, 0, ',', '.') }}</span>
@@ -208,13 +245,19 @@
                     <span>Change:</span>
                     <span>IDR {{ number_format($transaction->change, 0, ',', '.') }}</span>
                 </div>
+            @elseif($transaction->payment_method === 'credit_card' || $transaction->payment_method === 'e-wallet')
+                <div class="total-row">
+                    <span>Status:</span>
+                    <span style="color: green; font-weight: bold;">PAID / LUNAS</span>
+                </div>
             @endif
         </div>
 
         <div class="footer">
-            Thank you for your purchase!<br/>
+            Thank you for your purchase!<br />
             Visit us again at ALTAR Part & Computer
         </div>
     </div>
 </body>
+
 </html>

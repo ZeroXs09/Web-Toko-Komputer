@@ -16,18 +16,17 @@ class CartController extends Controller
             $cart[$productId]['quantity']++;
         } else {
             $cart[$productId] = [
-                "id" => $product->id,
-                "name" => $product->name,
+                "id"       => $product->id,
+                "name"     => $product->name,
                 "category" => $product->category,
-                "price" => $product->price,
-                "image" => $product->image,
-                "quantity" => 1
+                "price"    => $product->price,
+                "image"    => $product->image,
+                "quantity" => 1,
             ];
         }
 
         session()->put('cart', $cart);
-
-        return redirect()->back()->with('success', 'Product added to cart!');
+        return redirect()->back()->with('success', 'Produk ditambahkan ke keranjang!');
     }
 
     public function view()
@@ -49,35 +48,29 @@ class CartController extends Controller
     public function update(Request $request, $productId)
     {
         $cart = session()->get('cart', []);
-
         if (isset($cart[$productId])) {
             $cart[$productId]['quantity'] = $request->quantity;
-
             if ($cart[$productId]['quantity'] <= 0) {
                 unset($cart[$productId]);
             }
-
             session()->put('cart', $cart);
         }
-
-        return redirect()->back()->with('success', 'Cart updated!');
+        return redirect()->back()->with('success', 'Keranjang diperbarui!');
     }
 
     public function remove($productId)
     {
         $cart = session()->get('cart', []);
-
         if (isset($cart[$productId])) {
             unset($cart[$productId]);
             session()->put('cart', $cart);
         }
-
-        return redirect()->back()->with('success', 'Product removed from cart!');
+        return redirect()->back()->with('success', 'Item dihapus!');
     }
 
     public function clear()
     {
         session()->forget('cart');
-        return redirect()->route('build')->with('success', 'Cart cleared!');
+        return redirect()->route('build')->with('success', 'Keranjang dikosongkan!');
     }
 }

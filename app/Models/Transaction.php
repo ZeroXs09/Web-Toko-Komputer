@@ -9,17 +9,22 @@ class Transaction extends Model
 {
     use HasFactory;
 
-   protected $fillable = [
-    'customer_name',
-    'customer_phone',
-    'customer_address',
-    'tax',
-    'total',
-    'payment_method',
-    'subtotal',
-    'cash_amount',
-    'change'
-];
+    protected $fillable = [
+        'user_id',
+        'customer_name',
+        'customer_phone',
+        'customer_address',
+        'subtotal',
+        'tax',
+        'total',
+        'payment_method',
+        'cash_amount',
+        'change',
+        'transaction_id',   // <-- tambahkan
+        'transaction_date', // <-- tambahkan
+        'status'            // <-- tambahkan
+    ];
+
     protected $casts = [
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
@@ -29,18 +34,15 @@ class Transaction extends Model
         'transaction_date' => 'datetime',
     ];
 
-    // Relationship dengan transaction items
     public function items()
     {
         return $this->hasMany(TransactionItem::class);
     }
 
-    // Generate Transaction ID
     public static function generateTransactionId()
     {
         return 'TRX-' . strtoupper(substr(uniqid(), -8));
     }
-
 
     protected static function boot()
     {
@@ -52,6 +54,9 @@ class Transaction extends Model
             }
             if (empty($transaction->transaction_date)) {
                 $transaction->transaction_date = now();
+            }
+            if (empty($transaction->status)) {
+                $transaction->status = 'pending'; // default
             }
         });
     }

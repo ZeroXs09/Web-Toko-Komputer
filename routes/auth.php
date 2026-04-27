@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
-    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/build', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::resource('products', ProductController::class);
 

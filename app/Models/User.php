@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -46,8 +47,23 @@ class User extends Authenticatable
         ];
     }
 
+    public function isAdmin()
+    {
+        return $this->role == 1;
+    }
+
+    public function isUser()
+    {
+        return $this->role == 0;
+    }
+
+    public function isKasir()
+    {
+        return $this->role == 2;
+    }
+
     public function addresses()
     {
-       return $this->hasMany(Address::class);
+        return $this->hasMany(Address::class);
     }
 }

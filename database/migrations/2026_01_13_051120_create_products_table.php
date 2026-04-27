@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('category', ['Processor', 'Graphics Card', 'Motherboard', 'Memory', 'Case']);
+            $table->enum('category', ['Processor', 'Graphics Card', 'Motherboard', 'Memory', 'Case', 'Power Supply', 'Storage', 'Cooling']);
             $table->decimal('price', 12, 2);
             $table->string('image')->nullable();
             $table->text('description')->nullable();

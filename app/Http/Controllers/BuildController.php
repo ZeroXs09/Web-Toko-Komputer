@@ -8,7 +8,7 @@ use App\Models\Product;
 class BuildController extends Controller
 {
 
-Public function index()
+public function index()
     {
        $products = Product::all();
        return view('build', compact('products'));

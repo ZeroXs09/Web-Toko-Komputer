@@ -1,8 +1,8 @@
 <!-- Brand Partners Section -->
-<div class="bg-[#1a1a1a] py-16 overflow-hidden border-y border-gray-800">
+<div class="bg-[#1a1a1a] py-16 overflow-hidden border-y border-white">
     <div class="max-w-7xl mx-auto px-6">
         <h2
-         class="text-center text-gray-500 text-sm font-bold tracking-[0.2em] uppercase mb-12">
+         class="text-center text-white text-sm font-bold tracking-[0.2em] uppercase mb-12">
             Our Brand Partners
         </h2>
 

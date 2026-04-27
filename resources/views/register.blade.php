@@ -72,5 +72,11 @@
         </div>
     </div>
 
+    @if ($errors->any())
+    <div class="mb-4 text-red-500 text-sm font-bold">
+        {{ $errors->first() }}
+    </div>
+@endif
+
 </body>
 </html>
