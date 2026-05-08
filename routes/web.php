@@ -28,7 +28,8 @@ Route::prefix('cart')->group(function () {
 Route::prefix('checkout')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/process', [CheckoutController::class, 'process'])->name('checkout.process');
-    Route::get('/receipt/{id}', [CheckoutController::class, 'showReceipt'])->name('checkout.receipt');
+    Route::get('/payment/{transaction}', [CheckoutController::class, 'paymentSuccess'])->name('checkout.payment');
+    Route::get('/qr-code/{transaction}', [CheckoutController::class, 'generateQR'])->name('checkout.qr');
 });
 
 // AUTH
@@ -40,7 +41,6 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 // PROTECTED
 Route::middleware(['auth'])->group(function () {
-
     // KASIR
     Route::prefix('kasir')->group(function () {
         Route::get('/', [KasirController::class, 'index'])->name('kasir.index');

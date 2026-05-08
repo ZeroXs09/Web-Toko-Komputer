@@ -38,22 +38,16 @@
                                     Approve
                                 </button>
                             </form>
-                        @endif
 
-                        @if (Auth::user()->role == 2 && $transaction->status === 'pending')
-                            {{-- Tombol Reject --}}
-                            <form action="{{ route('kasir.reject', $transaction->id) }}" method="POST"
-                                onsubmit="return confirm('Tolak transaksi ini?')">
-                                @csrf
-                                <button type="submit"
-                                    class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-bold">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                    Reject
-                                </button>
-                            </form>
+                            {{-- Tombol Reject (buka modal) --}}
+                            <button type="button" onclick="openRejectModal()"
+                                class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-bold">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Reject
+                            </button>
                         @endif
 
                         @if ($transaction->status === 'approved')
@@ -68,6 +62,15 @@
                         @endif
                     </div>
                 </div>
+
+                {{-- Tampilkan alasan reject jika status rejected dan ada isinya --}}
+                @if ($transaction->status === 'rejected')
+                    <div class="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
+                        <p class="text-red-300 text-sm font-bold mb-1">Reason for Rejection:</p>
+                        <p class="text-white text-sm">
+                            {{ $transaction->rejection_reason ?? 'Tidak ada alasan yang diberikan.' }}</p>
+                    </div>
+                @endif
 
                 {{-- Informasi transaksi --}}
                 <div class="grid md:grid-cols-2 gap-6 mb-8 p-6 bg-[#2a2a2a] rounded-lg border border-gray-700">
@@ -87,7 +90,8 @@
                         <p class="text-gray-400 text-sm mb-1">Payment Method</p>
                         <p
                             class="text-white font-medium uppercase px-2 py-0.5 bg-[#333] rounded w-fit text-xs border border-gray-600">
-                            {{ $transaction->payment_method }}</p>
+                            {{ $transaction->payment_method }}
+                        </p>
                     </div>
                     <div class="md:col-span-2 pt-4 border-t border-gray-700">
                         <p class="text-gray-400 text-sm mb-1">Shipping Address</p>
@@ -143,6 +147,13 @@
                             </div>
                         </div>
                     @endif
+
+                    @if ($transaction->payment_method === 'e-wallet' && $transaction->ewallet_provider)
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">E-Wallet Provider</p>
+                            <p class="text-white font-medium uppercase">{{ $transaction->ewallet_provider }}</p>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="mt-8 pt-8 border-t border-gray-800 flex justify-center">
@@ -159,4 +170,90 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Reject --}}
+    <div id="rejectModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300"
+                onclick="closeRejectModal()"></div>
+            <div class="relative bg-[#1a1a1a] border border-gray-700 rounded-xl p-8 max-w-md w-full shadow-2xl transform transition-all duration-300 scale-95 opacity-0"
+                id="rejectModalCard">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-white uppercase tracking-tight">Reject Transaction</h3>
+                    <button onclick="closeRejectModal()"
+                        class="text-gray-400 hover:text-white transition-colors text-xl">✕</button>
+                </div>
+                <form id="rejectForm" action="{{ route('kasir.reject', $transaction->id) }}" method="POST"
+                    class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="text-gray-400 text-sm block mb-2">Reason for Rejection</label>
+                        <textarea name="rejection_reason" rows="4" placeholder="Masukkan alasan penolakan (minimal 5 karakter)..."
+                            class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded-lg text-white focus:border-red-500 outline-none transition-all"
+                            required></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button" onclick="closeRejectModal()"
+                            class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition">Batal</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-bold">Ya,
+                            Tolak</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openRejectModal() {
+            const modal = document.getElementById('rejectModal');
+            const card = document.getElementById('rejectModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeRejectModal() {
+            const modal = document.getElementById('rejectModal');
+            const card = document.getElementById('rejectModalCard');
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                timer: 2500,
+                showConfirmButton: false,
+                iconColor: '#4ade80'
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                title: 'Error!',
+                text: "{{ session('error') }}",
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff',
+                timer: 3000,
+                showConfirmButton: true,
+                confirmButtonColor: '#ef4444'
+            });
+        </script>
+    @endif
+
 @endsection

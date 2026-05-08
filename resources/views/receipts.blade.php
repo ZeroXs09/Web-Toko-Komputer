@@ -206,24 +206,10 @@
                                                     </form>
                                                 @endif
 
-                                                {{-- Tombol Reject (hanya untuk kasir & status pending) --}}
-                                                @if (Auth::user()->role == 2 && $transaction->status == 'pending')
-                                                    <form action="{{ route('kasir.reject', $transaction->id) }}"
-                                                        method="POST" onsubmit="return confirm('Tolak transaksi ini?')">
-                                                        @csrf
-                                                        <button type="submit" title="Reject"
-                                                            class="p-2 bg-red-500/10 text-red-400 rounded-md hover:bg-red-500 hover:text-white transition-all">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                            </svg>
-                                                        </button>
-                                                    </form>
-                                                @endif
 
-                                                {{-- Tombol Delete (hanya untuk customer atau kasir, terserah) --}}
-                                                @if (Auth::user()->role != 2 || $transaction->status == 'rejected')
+
+                                                {{-- Tombol Delete – hanya untuk user pemilik (bukan kasir) --}}
+                                                @if (Auth::user()->role != 2 && Auth::user()->id == $transaction->user_id)
                                                     <form action="{{ route('receipt.delete', $transaction->id) }}"
                                                         method="POST"
                                                         onsubmit="return confirm('Yakin ingin menghapus riwayat transaksi ini?')">
@@ -235,8 +221,7 @@
                                                                 viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     stroke-width="2"
-                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                                </path>
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                             </svg>
                                                         </button>
                                                     </form>

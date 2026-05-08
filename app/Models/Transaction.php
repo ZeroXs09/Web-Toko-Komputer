@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Transaction extends Model
 {
     use HasFactory;
@@ -18,11 +19,13 @@ class Transaction extends Model
         'tax',
         'total',
         'payment_method',
+         'ewallet_provider',   // <--- tambah ini
         'cash_amount',
         'change',
         'transaction_id',   // <-- tambahkan
         'transaction_date', // <-- tambahkan
-        'status'            // <-- tambahkan
+        'status' ,           // <-- tambahkan
+        'rejection_reason'  // ← pastikan ini ada
     ];
 
     protected $casts = [

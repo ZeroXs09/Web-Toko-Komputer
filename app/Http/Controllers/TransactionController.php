@@ -9,32 +9,41 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    // Halaman daftar riwayat transaksi untuk customer (hanya yang approved)
+    /**
+     * Halaman daftar riwayat transaksi.
+     * - Admin (role=1): lihat semua transaksi.
+     * - Kasir (role=2): lihat semua transaksi (untuk approve/reject).
+     * - User (role=3 atau selain 1&2): lihat transaksi miliknya sendiri, SEMUA STATUS (pending, approved, rejected).
+     */
     public function index(Request $request)
     {
-        // Jika user adalah kasir (role = 2), tampilkan semua transaksi (pending & approved)
-        if (Auth::user()->role == 2) {
-            $query = Transaction::with('items')
-                ->latest('transaction_date');
+        $user = Auth::user();
+
+        if ($user->role == 1) {
+            // Admin: semua transaksi
+            $query = Transaction::with('items')->latest('transaction_date');
+        } elseif ($user->role == 2) {
+            // Kasir: semua transaksi (biar bisa approve/reject)
+            $query = Transaction::with('items')->latest('transaction_date');
         } else {
-            // Customer biasa: hanya lihat transaksi miliknya sendiri yang sudah approved
+            // User biasa: hanya transaksi milik sendiri, semua status
             $query = Transaction::with('items')
-                ->where('user_id', Auth::id())
-                ->where('status', 'approved')
+                ->where('user_id', $user->id)
                 ->latest('transaction_date');
         }
 
-        // Search
-        if ($request->has('search') && !empty($request->search)) {
-            $query->where(function ($q) use ($request) {
-                $q->where('transaction_id', 'LIKE', '%' . $request->search . '%')
-                    ->orWhere('customer_name', 'LIKE', '%' . $request->search . '%');
+        // Fitur search berdasarkan transaction_id atau customer_name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('transaction_id', 'LIKE', "%{$search}%")
+                    ->orWhere('customer_name', 'LIKE', "%{$search}%");
             });
         }
 
         $transactions = $query->get();
 
-        // Statistik berdasarkan transaksi yang tampil (bukan seluruh database)
+        // Statistik dari transaksi yang tampil (bukan semua database)
         $totalRevenue = $transactions->sum('total');
         $totalTransactions = $transactions->count();
         $totalItems = $transactions->sum(function ($transaction) {
@@ -46,15 +55,20 @@ class TransactionController extends Controller
         return view('receipts', compact('transactions', 'totalRevenue', 'totalTransactions', 'totalItems', 'cartCount'));
     }
 
-    // Halaman detail receipt (bisa diakses customer untuk transaksi approved, atau kasir untuk semua)
+    /**
+     * Detail transaksi.
+     * - Admin & kasir: bisa lihat semua detail.
+     * - User: hanya bisa lihat transaksi milik sendiri (tanpa batasan status, bisa pending/approved/rejected).
+     */
     public function show($id)
     {
         $transaction = Transaction::with('items')->findOrFail($id);
+        $user = Auth::user();
 
-        // Customer hanya boleh melihat transaksi miliknya sendiri dan sudah approved
-        if (Auth::user()->role != 2) { // bukan kasir
-            if ($transaction->user_id != Auth::id() || $transaction->status !== 'approved') {
-                abort(403, 'Unauthorized or transaction not approved yet.');
+        // Jika bukan admin/kasir, maka harus pemilik transaksi
+        if (!in_array($user->role, [1, 2])) {
+            if ($transaction->user_id !== $user->id) {
+                abort(403, 'You are not authorized to view this transaction.');
             }
         }
 
@@ -63,36 +77,54 @@ class TransactionController extends Controller
         return view('receipt-detail', compact('transaction', 'cartCount'));
     }
 
-    // Hapus transaksi (hanya untuk customer, hanya transaksi approved)
+    /**
+     * Hapus transaksi.
+     * - Admin: bisa hapus transaksi apapun.
+     * - Kasir: hanya bisa hapus transaksi dengan status 'rejected'.
+     * - User: hanya bisa hapus transaksi milik sendiri dengan status 'approved' (atau sesuai kebijakan).
+     */
+    /**
+     * Hapus transaksi.
+     * - Admin (role=1): hapus semua.
+     * - Kasir (role=2): hanya hapus transaksi dengan status 'rejected'.
+     * - User (role selain 1&2): hanya hapus transaksi milik sendiri dengan status 'approved' atau 'rejected'.
+     */
     public function delete($id)
     {
         $transaction = Transaction::findOrFail($id);
+        $user = Auth::user();
 
-        // Jika user adalah kasir (role 2), izinkan hapus transaksi yang statusnya rejected
-        if (Auth::user()->role == 2) {
-            if ($transaction->status !== 'rejected') {
-                return redirect()->route('receipts')->with('error', 'Hanya transaksi yang ditolak yang dapat dihapus oleh kasir.');
-            }
-            $transaction->delete();
-            return redirect()->route('receipts')->with('success', 'Transaksi berhasil dihapus.');
+        // Kasir (role 2) tidak boleh menghapus
+        if ($user->role == 2) {
+            return redirect()->route('receipts')->with('error', 'Kasir tidak diizinkan menghapus transaksi.');
         }
 
-        
-        if ($transaction->user_id !== Auth::id() || $transaction->status !== 'approved') {
-            abort(403, 'Unauthorized action.');
+        // Jika user biasa (bukan admin), cek kepemilikan
+        if ($user->role != 1) {
+            if ($transaction->user_id !== $user->id) {
+                abort(403, 'Anda bukan pemilik transaksi ini.');
+            }
         }
 
         $transaction->delete();
-        return redirect()->route('receipts')->with('success', 'Receipt deleted successfully!');
+        return redirect()->route('receipts')->with('success', 'Transaksi berhasil dihapus.');
     }
-
-    // Cetak PDF (sama seperti sebelumnya)
+    /**
+     * Cetak PDF.
+     * - User: hanya bisa cetak transaksi milik sendiri (boleh pending atau approved, sesuai kebutuhan).
+     * - Kasir/admin: bisa cetak semua.
+     */
     public function print($id)
     {
-        $transaction = Transaction::with('items')
-            ->where('user_id', Auth::id())
-            ->where('status', 'approved')
-            ->findOrFail($id);
+        $transaction = Transaction::with('items')->findOrFail($id);
+        $user = Auth::user();
+
+        if (!in_array($user->role, [1, 2])) {
+            // User biasa: harus milik sendiri
+            if ($transaction->user_id !== $user->id) {
+                abort(403, 'Unauthorized.');
+            }
+        }
 
         $pdf = Pdf::loadView('pdf.receipt', compact('transaction'));
         return $pdf->download('receipt-' . $transaction->transaction_id . '.pdf');
