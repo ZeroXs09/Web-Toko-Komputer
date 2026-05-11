@@ -83,20 +83,7 @@
                                 </label>
                             </div>
 
-                            <!-- Cash Amount Section (muncul jika cash dipilih) -->
-                            <div id="cashAmountSection" class="mt-4 hidden border-t border-gray-700 pt-4">
-                                <label class="block text-gray-400 mb-2">Cash Amount</label>
-                                <input type="number" name="cash_amount" id="cashAmountInput"
-                                    value="{{ old('cash_amount') }}"
-                                    class="w-full px-4 py-3 bg-[#2a2a2a] border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
-                                <div id="changeDisplay" class="mt-3 text-green-400 font-medium hidden">
-                                    Change: IDR <span id="changeAmount">0</span>
-                                </div>
-                                @error('cash_amount')
-                                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
+                          
                             <!-- E-Wallet Provider Section (muncul jika e-wallet dipilih) -->
                             <div id="ewalletProviderSection" class="mt-4 hidden border-t border-gray-700 pt-4">
                                 <label class="block text-gray-400 mb-2 text-sm uppercase tracking-wider font-bold">Pilih
