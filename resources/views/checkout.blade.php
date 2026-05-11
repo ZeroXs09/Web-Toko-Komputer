@@ -32,7 +32,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-gray-400 mb-2">Phone Number *</label>
-                                    <input type="text" name="customer_phone" value="{{ old('customer_phone') }}"
+                                    <input type="number" name="customer_phone" value="{{ old('customer_phone') }}"
                                         class="w-full px-4 py-3 bg-[#2a2a2a] border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-white transition-all @error('customer_phone') border-red-500 @enderror"
                                         required>
                                     @error('customer_phone')
@@ -56,17 +56,7 @@
                             class="bg-[#1a1a1a] border border-gray-700 rounded-lg p-6 transition-all duration-300 hover:border-white/30">
                             <h2 class="text-xl font-bold text-white mb-6">Payment Method</h2>
                             <div class="space-y-3">
-                                <!-- Cash -->
-                                <label
-                                    class="flex items-center gap-4 p-4 border border-gray-600 rounded-lg cursor-pointer hover:border-white transition group">
-                                    <input type="radio" name="payment_method" value="cash" class="w-5 h-5"
-                                        onchange="togglePaymentFields('cash')"
-                                        {{ old('payment_method') == 'cash' ? 'checked' : '' }} required>
-                                    <div class="flex-1">
-                                        <div class="text-white font-medium">Cash</div>
-                                        <div class="text-gray-400 text-sm">Pay with physical cash</div>
-                                    </div>
-                                </label>
+
 
                                 <!-- E-Wallet -->
                                 <label
