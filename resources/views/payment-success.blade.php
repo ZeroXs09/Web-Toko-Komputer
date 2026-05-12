@@ -27,7 +27,7 @@
 
             <div class="space-y-3">
                 <a href="{{ route('receipt.show', $transaction->id) }}" class="inline-block w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-bold">
-                    Lihat Detail Pesanan
+                   Sudah Bayar Dan Lihat Detail Pesanan
                 </a>
                 <a href="{{ route('build') }}" class="inline-block w-full bg-[#2a2a2a] text-white py-3 rounded-lg hover:bg-[#333] transition border border-gray-700">
                     Kembali ke Beranda

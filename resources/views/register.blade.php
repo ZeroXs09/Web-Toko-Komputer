@@ -6,7 +6,7 @@
     <title>Register - ALTAR</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#535353] min-h-screen bg-[#2a2a2a]  font-sans">
+<body class="bg-[#535353] min-h-screen  font-sans">
 
     <div class="min-h-screen flex items-center justify-center px-4 py-12">
         <div class="max-w-md w-full">
